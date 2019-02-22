@@ -72,10 +72,22 @@ namespace QuadTreeStarter
 		public void AddObject(GameObject gameObj)
 		{
 			// ACTIVITY: Complete this method
-			_objects.Add(gameObj);
-			if (_objects.Count > MAX_OBJECTS_BEFORE_SUBDIVIDE && _divisions == null)
+			if (_rect.Contains(gameObj.Rectangle))
 			{
-				Divide();
+				if(_divisions == null)
+					_objects.Add(gameObj);
+				else
+				{
+					foreach (QuadTreeNode division in _divisions)
+						if (division.Rectangle.Contains(gameObj.Rectangle))
+						{
+
+						}
+				}
+				if (_objects.Count > MAX_OBJECTS_BEFORE_SUBDIVIDE && _divisions == null)
+				{
+					Divide();
+				}
 			}
 		}
 
@@ -104,7 +116,7 @@ namespace QuadTreeStarter
 						i--;
 					}
 				}
-				}
+			}
 		}
 
 		/// <summary>
@@ -118,6 +130,11 @@ namespace QuadTreeStarter
 			List<Rectangle> rects = new List<Rectangle>();
 
 			// ACTIVITY: Complete this method
+			rects.Add(_rect);
+
+			if (_divisions != null)
+				foreach (QuadTreeNode division in _divisions)
+					rects.AddRange(division.GetAllRectangles());
 
 			return rects;
 		}
@@ -131,7 +148,19 @@ namespace QuadTreeStarter
 		public QuadTreeNode GetContainingQuad(Rectangle rect)
 		{
 			// ACTIVITY: Complete this method
+			if (_rect.Contains(rect))
+			{
+				QuadTreeNode smallest = this;
 
+				if (_divisions != null)
+					foreach (QuadTreeNode division in _divisions)
+					{
+						if (division.GetContainingQuad(rect) != null)
+							smallest = division.GetContainingQuad(rect);
+					}
+
+				return smallest;
+			}
 			// Return null if this quad doesn't completely contain
 			// the rectangle that was passed in
 			return null;
