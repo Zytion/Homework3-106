@@ -78,12 +78,22 @@ namespace QuadTreeStarter
 					_objects.Add(gameObj);
 				else
 				{
-					foreach (QuadTreeNode division in _divisions)
-						if (division.Rectangle.Contains(gameObj.Rectangle))
-						{
-
-						}
+					//If the gameObj is not contained within any of the divisions, add it to the current Quad
+					//This deals with gameObjs that are in multiple divisions
+					if (!_divisions[0].Rectangle.Contains(gameObj.Rectangle) && !_divisions[1].Rectangle.Contains(gameObj.Rectangle)
+						&& !_divisions[2].Rectangle.Contains(gameObj.Rectangle) && !_divisions[3].Rectangle.Contains(gameObj.Rectangle))
+						_objects.Add(gameObj);
+					//Oterwise add it to the division it is contined within
+					else
+					{
+						foreach (QuadTreeNode division in _divisions)
+							if (division.Rectangle.Contains(gameObj.Rectangle))
+							{
+								division.AddObject(gameObj);
+							}
+					}
 				}
+
 				if (_objects.Count > MAX_OBJECTS_BEFORE_SUBDIVIDE && _divisions == null)
 				{
 					Divide();
@@ -99,12 +109,14 @@ namespace QuadTreeStarter
 		public void Divide()
 		{
 			// ACTIVITY: Complete this method
+			//Divides the quad
 			_divisions = new QuadTreeNode[4];
 			_divisions[0] = new QuadTreeNode(_rect.X, _rect.Y, _rect.Width / 2, _rect.Height / 2);
 			_divisions[1] = new QuadTreeNode(_rect.X + _rect.Width / 2, _rect.Y, _rect.Width / 2, _rect.Height / 2);
 			_divisions[2] = new QuadTreeNode(_rect.X, _rect.Y + _rect.Height / 2, _rect.Width / 2, _rect.Height / 2);
 			_divisions[3] = new QuadTreeNode(_rect.X + _rect.Width / 2, _rect.Y + _rect.Height / 2, _rect.Width / 2, _rect.Height / 2);
 
+			//Moves game objects into thier smaller quads
 			foreach (QuadTreeNode divison in _divisions)
 			{
 				for (int i = 0; i < _objects.Count; i++)
