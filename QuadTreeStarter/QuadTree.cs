@@ -74,30 +74,27 @@ namespace QuadTreeStarter
 			// ACTIVITY: Complete this method
 			if (_rect.Contains(gameObj.Rectangle))
 			{
-				if(_divisions == null)
+				if (_divisions == null)
 					_objects.Add(gameObj);
+
+				//If the gameObj is not contained within any of the divisions, add it to the current Quad
+				//This deals with gameObjs that are in multiple divisions
+				else if (!_divisions[0].Rectangle.Contains(gameObj.Rectangle) && !_divisions[1].Rectangle.Contains(gameObj.Rectangle)
+						&& !_divisions[2].Rectangle.Contains(gameObj.Rectangle) && !_divisions[3].Rectangle.Contains(gameObj.Rectangle))
+					_objects.Add(gameObj);
+
+				//Oterwise add it to the division it is contined within
 				else
 				{
-					//If the gameObj is not contained within any of the divisions, add it to the current Quad
-					//This deals with gameObjs that are in multiple divisions
-					if (!_divisions[0].Rectangle.Contains(gameObj.Rectangle) && !_divisions[1].Rectangle.Contains(gameObj.Rectangle)
-						&& !_divisions[2].Rectangle.Contains(gameObj.Rectangle) && !_divisions[3].Rectangle.Contains(gameObj.Rectangle))
-						_objects.Add(gameObj);
-					//Oterwise add it to the division it is contined within
-					else
+					foreach (QuadTreeNode division in _divisions)
 					{
-						foreach (QuadTreeNode division in _divisions)
-							if (division.Rectangle.Contains(gameObj.Rectangle))
-							{
-								division.AddObject(gameObj);
-							}
+						if (division.Rectangle.Contains(gameObj.Rectangle))
+							division.AddObject(gameObj);
 					}
 				}
 
 				if (_objects.Count > MAX_OBJECTS_BEFORE_SUBDIVIDE && _divisions == null)
-				{
 					Divide();
-				}
 			}
 		}
 
